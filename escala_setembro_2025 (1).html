@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escala de Plantões - Setembro 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .employee-section {
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .employee-section:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .employee-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .employee-header:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
+        }
+
+        .employee-name {
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .employee-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+        }
+
+        .employee-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .employee-section.active .employee-content {
+            display: block;
+        }
+
+        .employee-section.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s ease;
+            font-size: 1.2em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px 10px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            font-size: 0.85em;
+            line-height: 1.6;
+            transition: all 0.2s ease;
+        }
+
+        td:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .day-number {
+            font-weight: 700;
+            font-size: 1.2em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .shift-type {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .location {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        /* Color scheme */
+        .noturno {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+        }
+
+        .diurno {
+            background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%);
+            color: #1e3a8a;
+        }
+
+        .recepcionista {
+            background: linear-gradient(135deg, #fda4af 0%, #fb7185 100%);
+            color: #831843;
+        }
+
+        .duplo {
+            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+            color: white;
+        }
+
+        .folga {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .empty {
+            background: white;
+            color: #d1d5db;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .employee-name {
+                font-size: 1.1em;
+            }
+
+            td {
+                padding: 10px 5px;
+                font-size: 0.75em;
+            }
+
+            .legend {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📅 Escala de Plantões</h1>
+            <p>Setembro 2025</p>
+        </header>
+
+        <div class="content">
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color noturno"></div>
+                    <span><strong>Noturno</strong> (19h às 7h)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color diurno"></div>
+                    <span><strong>Diurno</strong> (7h às 19h)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color recepcionista"></div>
+                    <span><strong>Recepcionista</strong> (8h às 17h)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color duplo"></div>
+                    <span><strong>Plantão Duplo</strong></span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color folga"></div>
+                    <span><strong>Folga</strong></span>
+                </div>
+            </div>
+
+            <!-- Ailton -->
+            <div class="employee-section">
+                <div class="employee-header" onclick="toggleSection(this)">
+                    <span class="employee-name">👤 Ailton</span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="employee-count">16 plantões</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="employee-content">
+                    <table>
+                        <tr>
+                            <th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sab</th><th>Dom</th>
+                        </tr>
+                        <tr>
+                            <td class="noturno"><span class="day-number">1</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">2</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">3</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">4</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">5</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">6</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">7</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="noturno"><span class="day-number">8</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">9</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">10</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">11</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">12</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">13</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">14</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">15</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">16</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">17</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">18</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">19</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">20</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="noturno"><span class="day-number">21</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                        </tr>
+                        <tr>
+                            <td class="noturno"><span class="day-number">22</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">23</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">24</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">25</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">26</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">27</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">28</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">29</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">30</span><span class="shift-type">Noturno</span><span class="location">Marçal Tower</span></td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Antônio -->
+            <div class="employee-section">
+                <div class="employee-header" onclick="toggleSection(this)">
+                    <span class="employee-name">👤 Antônio</span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="employee-count">15 plantões</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="employee-content">
+                    <table>
+                        <tr>
+                            <th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sab</th><th>Dom</th>
+                        </tr>
+                        <tr>
+                            <td class="noturno"><span class="day-number">1</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">2</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">3</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">4</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">5</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">6</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">7</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">8</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">9</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">10</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">11</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">12</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">13</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">14</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="noturno"><span class="day-number">15</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">16</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">17</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">18</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">19</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">20</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">21</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">22</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">23</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">24</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">25</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">26</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">27</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">28</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="noturno"><span class="day-number">29</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">30</span><span class="shift-type">Folga</span></td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Cora -->
+            <div class="employee-section">
+                <div class="employee-header" onclick="toggleSection(this)">
+                    <span class="employee-name">👤 Cora</span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="employee-count">16 plantões</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="employee-content">
+                    <table>
+                        <tr>
+                            <th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sab</th><th>Dom</th>
+                        </tr>
+                        <tr>
+                            <td class="noturno"><span class="day-number">1</span><span class="shift-type">Noturno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">2</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">3</span><span class="shift-type">Noturno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">4</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">5</span><span class="shift-type">Noturno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">6</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">7</span><span class="shift-type">Noturno</span><span class="location">Plataforma Arena G7</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">8</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">9</span><span class="shift-type">Noturno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">10</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">11</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">12</span><span class="shift-type">Noturno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="noturno"><span class="day-number">13</span><span class="shift-type">Noturno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">14</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">15</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">16</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">17</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">18</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">19</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">20</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">21</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">22</span><span class="shift-type">Folga</span></td>
+                            <td class="duplo"><span class="day-number">23</span><span class="shift-type">Plantão Duplo</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="diurno"><span class="day-number">24</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">25</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">26</span><span class="shift-type">Noturno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="noturno"><span class="day-number">27</span><span class="shift-type">Noturno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">28</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">29</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">30</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Edimilson -->
+            <div class="employee-section">
+                <div class="employee-header" onclick="toggleSection(this)">
+                    <span class="employee-name">👤 Edimilson</span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="employee-count">16 plantões</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="employee-content">
+                    <table>
+                        <tr>
+                            <th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sab</th><th>Dom</th>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">1</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">2</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">3</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">4</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">5</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">6</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">7</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="noturno"><span class="day-number">8</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">9</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">10</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">11</span><span class="shift-type">Folga</span></td>
+                            <td class="duplo"><span class="day-number">12</span><span class="shift-type">Plantão Duplo</span><span class="location">Marçal Tower / Edifício Global</span></td>
+                            <td class="diurno"><span class="day-number">13</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="noturno"><span class="day-number">14</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">15</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">16</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">17</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">18</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">19</span><span class="shift-type">Folga</span></td>
+                            <td class="duplo"><span class="day-number">20</span><span class="shift-type">Plantão Duplo</span><span class="location">Edifício Global</span></td>
+                            <td class="diurno"><span class="day-number">21</span><span class="shift-type">Diurno</span><span class="location">Edifício Global</span></td>
+                        </tr>
+                        <tr>
+                            <td class="noturno"><span class="day-number">22</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="diurno"><span class="day-number">23</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">24</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">25</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">26</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">27</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">28</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">29</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">30</span><span class="shift-type">Folga</span></td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Edivânia -->
+            <div class="employee-section">
+                <div class="employee-header" onclick="toggleSection(this)">
+                    <span class="employee-name">👤 Edivânia</span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="employee-count">13 plantões</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="employee-content">
+                    <table>
+                        <tr>
+                            <th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sab</th><th>Dom</th>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">1</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">2</span><span class="shift-type">Diurno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">3</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">4</span><span class="shift-type">Diurno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">5</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">6</span><span class="shift-type">Diurno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">7</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="diurno"><span class="day-number">8</span><span class="shift-type">Diurno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">9</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">10</span><span class="shift-type">Diurno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">11</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">12</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">13</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">14</span><span class="shift-type">Diurno</span><span class="location">Edifício Global</span></td>
+                        </tr>
+                        <tr>
+                            <td class="diurno"><span class="day-number">15</span><span class="shift-type">Diurno</span><span class="location">Edifício Global</span></td>
+                            <td class="diurno"><span class="day-number">16</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">17</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">18</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">19</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">20</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">21</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">22</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">23</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">24</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">25</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">26</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">27</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">28</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">29</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">30</span><span class="shift-type">Folga</span></td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Marcelo -->
+            <div class="employee-section">
+                <div class="employee-header" onclick="toggleSection(this)">
+                    <span class="employee-name">👤 Marcelo</span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="employee-count">17 plantões</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="employee-content">
+                    <table>
+                        <tr>
+                            <th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sab</th><th>Dom</th>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">1</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">2</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">3</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">4</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">5</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">6</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">7</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="diurno"><span class="day-number">8</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">9</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">10</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">11</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">12</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">13</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">14</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">15</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">16</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">17</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">18</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="diurno"><span class="day-number">19</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">20</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">21</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="diurno"><span class="day-number">22</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">23</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">24</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="diurno"><span class="day-number">25</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="diurno"><span class="day-number">26</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="diurno"><span class="day-number">27</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">28</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="diurno"><span class="day-number">29</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="noturno"><span class="day-number">30</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Matheus -->
+            <div class="employee-section">
+                <div class="employee-header" onclick="toggleSection(this)">
+                    <span class="employee-name">👤 Matheus</span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="employee-count">16 plantões</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="employee-content">
+                    <table>
+                        <tr>
+                            <th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sab</th><th>Dom</th>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">1</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">2</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">3</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">4</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">5</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">6</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">7</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="diurno"><span class="day-number">8</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="diurno"><span class="day-number">9</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="diurno"><span class="day-number">10</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="diurno"><span class="day-number">11</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="diurno"><span class="day-number">12</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="folga"><span class="day-number">13</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">14</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="diurno"><span class="day-number">15</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="diurno"><span class="day-number">16</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="folga"><span class="day-number">17</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">18</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="diurno"><span class="day-number">19</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="folga"><span class="day-number">20</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">21</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="diurno"><span class="day-number">22</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="diurno"><span class="day-number">23</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="diurno"><span class="day-number">24</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="diurno"><span class="day-number">25</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="diurno"><span class="day-number">26</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="folga"><span class="day-number">27</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">28</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="diurno"><span class="day-number">29</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="diurno"><span class="day-number">30</span><span class="shift-type">Diurno</span><span class="location">Marshall's School</span></td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Michael -->
+            <div class="employee-section">
+                <div class="employee-header" onclick="toggleSection(this)">
+                    <span class="employee-name">👤 Michael</span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="employee-count">16 plantões</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="employee-content">
+                    <table>
+                        <tr>
+                            <th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sab</th><th>Dom</th>
+                        </tr>
+                        <tr>
+                            <td class="diurno"><span class="day-number">1</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">2</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">3</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">4</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">5</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">6</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">7</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">8</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">9</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">10</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">11</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">12</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">13</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">14</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="diurno"><span class="day-number">15</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="diurno"><span class="day-number">16</span><span class="shift-type">Diurno</span><span class="location">Edifício Global</span></td>
+                            <td class="diurno"><span class="day-number">17</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="diurno"><span class="day-number">18</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">19</span><span class="shift-type">Folga</span></td>
+                            <td class="diurno"><span class="day-number">20</span><span class="shift-type">Diurno</span><span class="location">Marçal Tower</span></td>
+                            <td class="folga"><span class="day-number">21</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="folga"><span class="day-number">22</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">23</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">24</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">25</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">26</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">27</span><span class="shift-type">Folga</span></td>
+                            <td class="noturno"><span class="day-number">28</span><span class="shift-type">Noturno</span><span class="location">Edifício Global</span></td>
+                        </tr>
+                        <tr>
+                            <td class="noturno"><span class="day-number">29</span><span class="shift-type">Noturno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">30</span><span class="shift-type">Folga</span></td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tassiana -->
+            <div class="employee-section">
+                <div class="employee-header" onclick="toggleSection(this)">
+                    <span class="employee-name">👤 Tassiana</span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="employee-count">23 plantões</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="employee-content">
+                    <table>
+                        <tr>
+                            <th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sab</th><th>Dom</th>
+                        </tr>
+                        <tr>
+                            <td class="recepcionista"><span class="day-number">1</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">2</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">3</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">4</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">5</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">6</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">7</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="recepcionista"><span class="day-number">8</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">9</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">10</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">11</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">12</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">13</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">14</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="recepcionista"><span class="day-number">15</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">16</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">17</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">18</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">19</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="diurno"><span class="day-number">20</span><span class="shift-type">Diurno</span><span class="location">Plataforma Arena G7</span></td>
+                            <td class="folga"><span class="day-number">21</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="recepcionista"><span class="day-number">22</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">23</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">24</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">25</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">26</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="folga"><span class="day-number">27</span><span class="shift-type">Folga</span></td>
+                            <td class="folga"><span class="day-number">28</span><span class="shift-type">Folga</span></td>
+                        </tr>
+                        <tr>
+                            <td class="recepcionista"><span class="day-number">29</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="recepcionista"><span class="day-number">30</span><span class="shift-type">Recepcionista</span><span class="location">Edifício Global</span></td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                            <td class="empty">-</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            <p>Escala gerada automaticamente • Setembro 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleSection(header) {
+            const section = header.parentElement;
+            section.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
